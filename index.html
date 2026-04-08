@@ -138,7 +138,17 @@
     </style>
 </head>
 <body>
-
+    
+<script>
+  (function() {
+    const password = prompt("パスワードを入力してください:");
+    if (password !== "Hokusou2026") { // ここに好きなパスワードを設定
+      alert("パスワードが違います。");
+      document.body.innerHTML = "<h1>閲覧権限がありません。</h1>";
+    }
+  })();
+</script>
+    
 <div class="container">
     <header>
         <h1>🛠️ 北総ローカルツール集積所</h1>

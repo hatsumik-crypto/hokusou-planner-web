@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>北総ローカルツール集積所 2026</title>
+    
     <style>
+        /* 認証前はコンテンツを非表示にする */
+        #main-content { display: none; }
+        
         :root {
-            --accent-data: #2563eb;    /* 青：FAS・データ */
-            --accent-event: #059669;   /* 緑：イベント */
-            --accent-ai: #7c3aed;      /* 紫：NotebookLM */
+            --accent-data: #2563eb;
+            --accent-event: #059669;
+            --accent-ai: #7c3aed;
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -24,178 +29,92 @@
             padding: 0;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            color: #0f172a;
-        }
-
-        header p {
-            color: var(--text-sub);
-            margin-top: 10px;
-        }
-
-        /* セクション設定 */
-        section {
-            margin-bottom: 40px;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        h2::before {
-            content: "";
-            display: inline-block;
-            width: 6px;
-            height: 24px;
-            margin-right: 12px;
-            border-radius: 3px;
-        }
-
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+        header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        section { margin-bottom: 40px; }
+        h2 { font-size: 1.3rem; display: flex; align-items: center; margin-bottom: 20px; }
+        h2::before { content: ""; display: inline-block; width: 6px; height: 24px; margin-right: 12px; border-radius: 3px; }
         .sec-data h2::before { background-color: var(--accent-data); }
         .sec-event h2::before { background-color: var(--accent-event); }
         .sec-ai h2::before { background-color: var(--accent-ai); }
-
-        /* グリッドレイアウト */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        /* カードデザイン */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h3 {
-            margin: 0 0 12px 0;
-            font-size: 1.1rem;
-        }
-
-        .card p {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-
-        /* ボタンデザイン */
-        .btn {
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-
-        .btn-data { background-color: var(--accent-data); color: white; }
-        .btn-event { background-color: var(--accent-event); color: white; }
-        .btn-ai { background-color: var(--accent-ai); color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; transition: transform 0.2s; border: 1px solid #e2e8f0; }
+        .card:hover { transform: translateY(-4px); }
+        .btn { display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; color: white; }
+        .btn-data { background-color: var(--accent-data); }
+        .btn-event { background-color: var(--accent-event); }
+        .btn-ai { background-color: var(--accent-ai); }
         .btn-disabled { background-color: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
-
-        .btn:hover:not(.btn-disabled) {
-            opacity: 0.9;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-        }
+        footer { text-align: center; margin-top: 60px; font-size: 0.8rem; color: var(--text-sub); }
     </style>
+
+    <script>
+        // 簡易パスワード認証
+        (function() {
+            const pass = prompt("パスワードを入力してください:");
+            if (pass === "Hokusou2026") { // ← ここを好きなパスワードに変えてください
+                window.onload = function() {
+                    document.getElementById('main-content').style.display = 'block';
+                };
+            } else {
+                alert("パスワードが正しくありません。");
+                document.write("<h1>閲覧権限がありません。ページを再読み込みして正しいパスワードを入力してください。</h1>");
+            }
+        })();
+    </script>
 </head>
 <body>
-    
-<script>
-  (function() {
-    const password = prompt("パスワードを入力してください:");
-    if (password !== "Hokusou2026") { // ここに好きなパスワードを設定
-      alert("パスワードが違います。");
-      document.body.innerHTML = "<h1>閲覧権限がありません。</h1>";
-    }
-  })();
-</script>
-    
-<div class="container">
-    <header>
-        <h1>🛠️ 北総ローカルツール集積所</h1>
-        <p>現場独自の開発ツール・ナレッジをここに集約しています</p>
-    </header>
 
-    <section class="sec-data">
-        <h2>📊 顧客管理・プランナー状況</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>北総FAS状況</h3>
-                <p>プランナー個人の会員保有数や属性データをまとめたダッシュボードです（個人情報を含まない統計データ）。</p>
-                <a href="https://ishiharaj-cyber.github.io/hokuso-fas/%E5%8C%97%E7%B7%8FFAS%E7%8A%B6%E6%B3%81/" target="_blank" class="btn btn-data">FASを確認する</a>
-            </div>
-        </div>
-    </section>
+<div id="main-content">
+    <div class="container">
+        <header>
+            <h1>🛠️ 北総ローカルツール集積所</h1>
+            <p>現場独自の開発ツール・ナレッジをここに集約しています</p>
+        </header>
 
-    <section class="sec-event">
-        <h2>📅 スケジュール・予定</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>2026年度イベントスケジュール</h3>
-                <p>2026年1月〜12月のイベント・施策スケジュールをHTML形式で一覧化したものです。</p>
-                <a href="https://ishiharaj-cyber.github.io/hokuso-folder/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/2026%E5%B9%B4%E5%BA%A6%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/" target="_blank" class="btn btn-event">カレンダーを開く</a>
+        <section class="sec-data">
+            <h2>📊 顧客管理・プランナー状況</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>北総FAS状況</h3>
+                    <p>プランナー個人の会員保有数や属性データをまとめたダッシュボードです。</p>
+                    <a href="https://ishiharaj-cyber.github.io/hokuso-fas/%E5%8C%97%E7%B7%8FFAS%E7%8A%B6%E6%B3%81/" target="_blank" class="btn btn-data">FASを確認する</a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="sec-ai">
-        <h2>🧠 AI ナレッジ検索 (NotebookLM)</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>社内制度・ルール検索</h3>
-                <p>社内制度、福利厚生、独自ルールに関する質問に回答するAIチャットです。</p>
-                <a href="#" class="btn btn-disabled">準備中</a>
+        <section class="sec-event">
+            <h2>📅 スケジュール・予定</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>2026年度イベントスケジュール</h3>
+                    <p>2026年1月〜12月のイベント・施策スケジュールをHTML形式で一覧化したものです。</p>
+                    <a href="https://ishiharaj-cyber.github.io/hokuso-folder/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/2026%E5%B9%B4%E5%BA%A6%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/" target="_blank" class="btn btn-event">カレンダーを開く</a>
+                </div>
             </div>
-            <div class="card">
-                <h3>効果資料・ナレッジ検索</h3>
-                <p>過去の効果資料や施策ナレッジをソースとしたAI検索ツールです。</p>
-                <a href="#" class="btn btn-disabled">準備中</a>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <footer>
-        &copy; 2026 北総チーム ローカル開発プロジェクト
-    </footer>
+        <section class="sec-ai">
+            <h2>🧠 AI ナレッジ検索 (NotebookLM)</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>社内制度・ルール検索</h3>
+                    <p>社内制度、福利厚生、独自ルールに関する質問に回答するAIチャットです。</p>
+                    <a href="#" class="btn btn-disabled">準備中</a>
+                </div>
+                <div class="card">
+                    <h3>効果資料・ナレッジ検索</h3>
+                    <p>過去の効果資料や施策ナレッジをソースとしたAI検索ツールです。</p>
+                    <a href="#" class="btn btn-disabled">準備中</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            &copy; 2026 北総チーム ローカル開発プロジェクト
+        </footer>
+    </div>
 </div>
 
 </body>

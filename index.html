@@ -7,9 +7,7 @@
     <title>北総ローカルツール集積所 2026</title>
     
     <style>
-        /* 最初はコンテンツを隠す */
         #main-content { display: none; }
-        
         :root {
             --accent-data: #2563eb; --accent-event: #059669; --accent-ai: #7c3aed; --accent-gem: #db2777;
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --text-sub: #64748b;
@@ -92,26 +90,26 @@
 
 <script>
     async function runAuth() {
-        const v = prompt("パスワードを入力してください:");
-        if (!v) { location.reload(); return; }
+        const rawInput = prompt("パスワードを入力してください:");
+        if (!rawInput) { location.reload(); return; }
+
+        // 前後の空白や改行を削除（トリミング）
+        const v = rawInput.trim();
 
         const msgUint8 = new TextEncoder().encode(v);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const d = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        // 正解のハッシュ値
         const k = "7f7f57348e89f6d788939634e9e4368945620853f6089f67a224f80079c6a1b0";
 
         if (d === k) {
-            // 正解：コンテンツを表示
             document.getElementById('main-content').style.display = 'block';
         } else {
-            // 失敗：エラー画面を表示
             document.body.innerHTML = `
                 <div style='text-align:center; margin-top:50px; font-family:sans-serif; padding: 20px;'>
                     <h1>認証に失敗しました</h1>
-                    <p>大文字小文字・半角入力を確認してください。</p>
+                    <p>パスワードは正確に入力されていますか？</p>
                     <hr style='max-width:400px; margin: 20px auto;'>
                     <p style='color:red; font-size:0.8rem;'>【デバッグ情報】ハッシュ値不一致<br>
                     <code style='background:#eee; padding:5px;'>${d}</code></p>
@@ -119,7 +117,6 @@
                 </div>`;
         }
     }
-    // 画面の読み込みが終わってから認証を開始
     runAuth();
 </script>
 

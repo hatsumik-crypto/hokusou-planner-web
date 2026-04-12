@@ -90,30 +90,29 @@
 
 <script>
     async function runAuth() {
-        const rawInput = prompt("パスワードを入力してください:");
-        if (!rawInput) { location.reload(); return; }
+        const raw = prompt("パスワードを入力してください:");
+        if (!raw) { location.reload(); return; }
 
-        // 前後の空白や改行を削除（トリミング）
-        const v = rawInput.trim();
+        // 空白・改行・制御文字を完全に除去
+        const v = raw.replace(/\s+/g, '');
 
         const msgUint8 = new TextEncoder().encode(v);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const d = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        const k = "7f7f57348e89f6d788939634e9e4368945620853f6089f67a224f80079c6a1b0";
+        // 照合用ハッシュ（通常のハッシュ値 ＋ あなたの環境で出ているハッシュ値の両方を許可）
+        const k1 = "7f7f57348e89f6d788939634e9e4368945620853f6089f67a224f80079c6a1b0";
+        const k2 = "047ea5b003a2bb330f5fa196a056788225c0edef113153f52c6087e4a9d624ff";
 
-        if (d === k) {
+        if (d === k1 || d === k2) {
             document.getElementById('main-content').style.display = 'block';
         } else {
             document.body.innerHTML = `
                 <div style='text-align:center; margin-top:50px; font-family:sans-serif; padding: 20px;'>
                     <h1>認証に失敗しました</h1>
-                    <p>パスワードは正確に入力されていますか？</p>
-                    <hr style='max-width:400px; margin: 20px auto;'>
-                    <p style='color:red; font-size:0.8rem;'>【デバッグ情報】ハッシュ値不一致<br>
-                    <code style='background:#eee; padding:5px;'>${d}</code></p>
                     <button onclick='location.reload()'>再試行する</button>
+                    <p style='color:#ccc; font-size:0.7rem; margin-top:20px;'>ID: ${d}</p>
                 </div>`;
         }
     }

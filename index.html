@@ -7,13 +7,13 @@
     <title>北総ローカルツール集積所 2026</title>
     
     <style>
-        /* 認証前はコンテンツを非表示にする */
+        /* 認証完了までコンテンツを非表示 */
         #main-content { display: none; }
         
         :root {
-            --accent-data: #2563eb;    /* 青：FAS・データ */
-            --accent-event: #059669;   /* 緑：イベント */
-            --accent-ai: #7c3aed;      /* 紫：NotebookLM */
+            --accent-data: #2563eb;
+            --accent-event: #059669;
+            --accent-ai: #7c3aed;
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -62,24 +62,37 @@
         .btn-data { background-color: var(--accent-data); }
         .btn-event { background-color: var(--accent-event); }
         .btn-ai { background-color: var(--accent-ai); }
-        .btn-disabled { background-color: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
-        .btn:hover:not(.btn-disabled) { opacity: 0.9; }
+        .btn:hover { opacity: 0.9; }
 
         footer { text-align: center; margin-top: 60px; font-size: 0.8rem; color: var(--text-sub); }
     </style>
 
     <script>
-        (function() {
-            const pass = prompt("パスワードを入力してください:");
-            if (pass === "Hokusou2026") {
-                window.onload = function() {
-                    document.getElementById('main-content').style.display = 'block';
-                };
-            } else {
-                alert("パスワードが正しくありません。");
-                document.write("<h1 style='text-align:center; margin-top:50px;'>閲覧権限がありません。ページを再読み込みして正しいパスワードを入力してください。</h1>");
+        // 認証処理
+        async function runAuth() {
+            const v = prompt("パスワードを入力してください:");
+            if (!v) {
+                location.reload();
+                return;
             }
-        })();
+
+            const msgUint8 = new TextEncoder().encode(v);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const d = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            // 照合用ハッシュ（ソースコードから直接パスワードは判別できません）
+            const k = "7f7f57348e89f6d788939634e9e4368945620853f6089f67a224f80079c6a1b0";
+
+            if (d === k) {
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert("認証に失敗しました。");
+                document.write("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h1>Access Denied.</h1><p>正しいパスワードを入力してください。</p></div>");
+            }
+        }
+        
+        runAuth();
     </script>
 </head>
 <body>
@@ -107,7 +120,7 @@
             <div class="grid">
                 <div class="card">
                     <h3>2026年度イベントスケジュール</h3>
-                    <p>2026年1月〜12月のイベント・施策スケジュールをHTML形式で一覧化したものです。</p>
+                    <p>2026年度のイベント・施策スケジュールをHTML形式で一覧化したものです。</p>
                     <a href="https://ishiharaj-cyber.github.io/hokuso-folder/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/2026%E5%B9%B4%E5%BA%A6%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/" target="_blank" class="btn btn-event">カレンダーを開く</a>
                 </div>
             </div>

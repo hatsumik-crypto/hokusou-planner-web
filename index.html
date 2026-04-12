@@ -14,6 +14,7 @@
             --accent-data: #2563eb;
             --accent-event: #059669;
             --accent-ai: #7c3aed;
+            --accent-gem: #db2777;    /* ピンク：Gemini Gems */
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -29,69 +30,62 @@
             padding: 0;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
         header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
         header p { color: var(--text-sub); margin-top: 10px; }
 
-        section { margin-bottom: 40px; }
-        h2 { font-size: 1.3rem; display: flex; align-items: center; margin-bottom: 20px; }
+        section { margin-bottom: 50px; }
+        h2 { font-size: 1.4rem; display: flex; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
         h2::before { content: ""; display: inline-block; width: 6px; height: 24px; margin-right: 12px; border-radius: 3px; }
         
         .sec-data h2::before { background-color: var(--accent-data); }
         .sec-event h2::before { background-color: var(--accent-event); }
         .sec-ai h2::before { background-color: var(--accent-ai); }
+        .sec-gem h2::before { background-color: var(--accent-gem); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
         .card { 
             background: var(--card-bg); 
             border-radius: 12px; 
-            padding: 24px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+            padding: 20px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
             display: flex; 
             flex-direction: column; 
-            transition: transform 0.2s; 
+            transition: transform 0.2s, box-shadow 0.2s; 
             border: 1px solid #e2e8f0; 
         }
         .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .card h3 { margin: 0 0 12px 0; font-size: 1.1rem; }
-        .card p { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; flex-grow: 1; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #334155; }
+        .card p { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; flex-grow: 1; }
 
-        .btn { display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; color: white; transition: opacity 0.2s; }
+        .btn { display: block; text-align: center; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
         .btn-data { background-color: var(--accent-data); }
         .btn-event { background-color: var(--accent-event); }
         .btn-ai { background-color: var(--accent-ai); }
-        .btn:hover { opacity: 0.9; }
+        .btn-gem { background-color: var(--accent-gem); }
+        .btn:hover { opacity: 0.8; }
 
         footer { text-align: center; margin-top: 60px; font-size: 0.8rem; color: var(--text-sub); }
     </style>
 
     <script>
-        // 認証処理
         async function runAuth() {
             const v = prompt("パスワードを入力してください:");
-            if (!v) {
-                location.reload();
-                return;
-            }
-
+            if (!v) { location.reload(); return; }
             const msgUint8 = new TextEncoder().encode(v);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             const d = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            // 照合用ハッシュ（ソースコードから直接パスワードは判別できません）
             const k = "7f7f57348e89f6d788939634e9e4368945620853f6089f67a224f80079c6a1b0";
-
             if (d === k) {
                 document.getElementById('main-content').style.display = 'block';
             } else {
                 alert("認証に失敗しました。");
-                document.write("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h1>Access Denied.</h1><p>正しいパスワードを入力してください。</p></div>");
+                document.write("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h1>Access Denied.</h1></div>");
             }
         }
-        
         runAuth();
     </script>
 </head>
@@ -120,7 +114,7 @@
             <div class="grid">
                 <div class="card">
                     <h3>2026年度イベントスケジュール</h3>
-                    <p>2026年度のイベント・施策スケジュールをHTML形式で一覧化したものです。</p>
+                    <p>2026年度のイベント・施策スケジュールの一覧です。</p>
                     <a href="https://ishiharaj-cyber.github.io/hokuso-folder/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/2026%E5%B9%B4%E5%BA%A6%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88/" target="_blank" class="btn btn-event">カレンダーを開く</a>
                 </div>
             </div>
@@ -131,18 +125,94 @@
             <div class="grid">
                 <div class="card">
                     <h3>パフォーマー認定相談</h3>
-                    <p>パフォーマー認定に関する基準や申請、相談事項をAIがサポートします。</p>
+                    <p>パフォーマー認定に関する基準や申請をAIがサポートします。</p>
                     <a href="https://notebooklm.google.com/notebook/5f4aff4c-ebab-4d5d-b3d4-833e94401eb6" target="_blank" class="btn btn-ai">AIに質問する</a>
                 </div>
                 <div class="card">
                     <h3>5スター承認者相談</h3>
-                    <p>5スター承認フローや基準について、資料をベースにAIが回答します。</p>
+                    <p>5スター承認フローや基準についてAIが回答します。</p>
                     <a href="https://notebooklm.google.com/notebook/2139d192-b096-46a5-9fe9-3215f8df48cf" target="_blank" class="btn btn-ai">AIに質問する</a>
                 </div>
                 <div class="card">
                     <h3>考課基準相談</h3>
-                    <p>考課結果にコミットするために、日頃どのような行動をすべきか基準を元にAIへ相談できます。</p>
+                    <p>考課結果にコミットするための行動基準をAIへ相談できます。</p>
                     <a href="https://notebooklm.google.com/notebook/0cb15ad4-26db-4c26-b205-8ea0f4683830" target="_blank" class="btn btn-ai">AIに質問する</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="sec-gem">
+            <h2>💎 AI相談窓口 (Gemini Gems)</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>朝礼要約</h3>
+                    <p>朝礼の内容を効率的に要約・整理します。</p>
+                    <a href="https://gemini.google.com/gem/1fIst4aQTxV18oF7G4hZqWmXcz8WQ3tpt?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>エンジニアアシスタント</h3>
+                    <p>技術的な課題解決やエンジニア業務をサポートします。</p>
+                    <a href="https://gemini.google.com/gem/1yQ4uyUXnl_SQvLuS9LiaLyftPJuDVwMn?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>デジタルライフレポート生成</h3>
+                    <p>各種データからデジタルライフのレポートを作成します。</p>
+                    <a href="https://gemini.google.com/gem/1KTw0VPKTi_68Z2PW1yNiRF0UTrV-T4Q2?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>通信プラン差分計算</h3>
+                    <p>複雑な通信プランの比較や差分計算を行います。</p>
+                    <a href="https://gemini.google.com/gem/1mSao2cgLLo4hk6GAuAZyKUkmyI-GZWsd?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>コース提案</h3>
+                    <p>状況に合わせた最適なプラン・コースを提案します。</p>
+                    <a href="https://gemini.google.com/gem/15CtUBHuGwM6B9MUOEaTUween1OJ2l0Ii?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>DLP理念</h3>
+                    <p>理念に基づいた判断や解釈をサポートします。</p>
+                    <a href="https://gemini.google.com/gem/10KTVaiNFUs5AAUr-FIBshsovDxllsKxX?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>商店主DX相談</h3>
+                    <p>商店主様向けのDX推進に関する相談窓口です。</p>
+                    <a href="https://gemini.google.com/gem/1xNe9sg_7hRLtfFZXS3Haq4AfRmC8PFYz?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>イレギュラー対応</h3>
+                    <p>通常とは異なる事態への対応方法を相談できます。</p>
+                    <a href="https://gemini.google.com/gem/1tyZIzOZm7SdPD7ld-5e1evsaEdEst9vC?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>社内手続・規定相談</h3>
+                    <p>社内の各種手続きや規定についてAIが回答します。</p>
+                    <a href="https://gemini.google.com/gem/1gOrgFt5TmfPLvP7y660ZBJNTmPTgxRvT?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>クリニック技術手順書</h3>
+                    <p>技術的な手順書の内容確認や相談が可能です。</p>
+                    <a href="https://gemini.google.com/gem/1zrqvPqx7HM9pDuxooi_tau-tzExzUkN0?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>メーカー修理・データ復旧</h3>
+                    <p>修理受付やデータ復旧に関する専門相談窓口です。</p>
+                    <a href="https://gemini.google.com/gem/1HygAam0Y-273Ra39rFDDc4Up3lq2Q9u8?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>テクノロジーニュース収集</h3>
+                    <p>最新の技術トレンドやニュースを収集・整理します。</p>
+                    <a href="https://gemini.google.com/gem/1tBiW90zllqk5OvsVNaGCzLxoba6sPZTc?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>メディア制作ルール</h3>
+                    <p>制作におけるガイドラインやルールを確認できます。</p>
+                    <a href="https://gemini.google.com/gem/1tROVLRbocJt2rkXpTLREadX8uF3XMIVa?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
+                </div>
+                <div class="card">
+                    <h3>小口現金・経費使用</h3>
+                    <p>経費精算や小口現金の取り扱いに関する相談窓口です。</p>
+                    <a href="https://gemini.google.com/gem/1OE--HfqVaVLRizPICfhV0zta25qFm1vy?usp=sharing" target="_blank" class="btn btn-gem">Gemを開く</a>
                 </div>
             </div>
         </section>

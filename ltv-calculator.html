@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LTV計算ツール | スマートライフメンバーズクラブ</title>
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --card: #ffffff;
+    --text: #1a2433;
+    --sub: #5a6b82;
+    --accent: #2563eb;
+    --accent-soft: #eaf1fe;
+    --border: #dde4ee;
+    --result-bg: #1e3a8a;
+    --result-bg-b: #0f766e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .container { width: 100%; max-width: 1080px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--sub); margin-bottom: 24px; }
+  .panels {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .panel { flex: 1; min-width: 320px; }
+  .panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-left: 10px;
+    border-left: 4px solid var(--result-bg);
+  }
+  .panel[data-panel="b"] .panel-title { border-left-color: var(--result-bg-b); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .hint { font-weight: 400; color: var(--sub); font-size: 12px; margin-left: 6px; }
+  .input-wrap { display: flex; align-items: center; gap: 8px; }
+  input[type="number"] {
+    flex: 1;
+    font-size: 18px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    width: 100%;
+    min-width: 0;
+  }
+  input[type="number"]:focus { border-color: var(--accent); background: var(--accent-soft); }
+  .unit { font-size: 14px; color: var(--sub); white-space: nowrap; }
+  .copy-btn {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--result-bg-b);
+    color: var(--result-bg-b);
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .copy-btn:hover { background: #e6f4f2; }
+  .copy-btn:active { background: #cfe9e5; }
+  .pair { display: flex; align-items: center; gap: 10px; }
+  .pair .input-wrap { flex: 1; }
+  .pair-arrow { color: var(--sub); font-size: 16px; flex-shrink: 0; }
+  .result-card {
+    background: var(--result-bg);
+    color: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+  .panel[data-panel="b"] .result-card { background: var(--result-bg-b); }
+  .result-label { font-size: 14px; opacity: 0.85; margin-bottom: 8px; }
+  .result-value { font-size: 34px; font-weight: 700; letter-spacing: 0.5px; }
+  .result-diff {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.15);
+  }
+  .result-diff.plus { background: #d1fadf; color: #065f46; }
+  .result-diff.minus { background: #fee2e2; color: #991b1b; }
+  .result-rows {
+    margin-top: 14px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    font-size: 13px;
+    text-align: left;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 7px 2px;
+    border-bottom: 1px dashed rgba(255,255,255,0.18);
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row span { opacity: 0.85; }
+  .result-row strong { font-size: 14px; white-space: nowrap; }
+  .formula {
+    font-size: 12px;
+    color: var(--sub);
+    text-align: center;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>LTV計算ツール</h1>
+  <p class="subtitle">スマートライフメンバーズクラブ｜①継続月数 = 1÷CCR　②一人あたりLTV = 継続月数×ARPU　③LTV総額 = ②×会員数　④MRR = 会員数×ARPU　⑤ARR = ④×12ヶ月</p>
+
+  <div class="panels">
+
+    <div class="panel" data-panel="a">
+      <div class="panel-title">パターンA</div>
+      <div class="card">
+        <div class="field">
+          <label>会員数</label>
+          <div class="input-wrap">
+            <input type="number" class="members" value="3441" min="0" step="1">
+            <span class="unit">名</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>退会軒数 ⇄ CCR（退会率）<span class="hint">どちらかを入力するともう片方が自動計算されます</span></label>
+          <div class="pair">
+            <div class="input-wrap">
+              <input type="number" class="churnCount" value="20" min="0" step="1">
+              <span class="unit">軒</span>
+            </div>
+            <span class="pair-arrow">⇄</span>
+            <div class="input-wrap">
+              <input type="number" class="ccr" value="" min="0" max="100" step="0.01">
+              <span class="unit">％</span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>単価（ARPU）<span class="hint">月額</span></label>
+          <div class="input-wrap">
+            <input type="number" class="price" value="6356" min="0" step="1">
+            <span class="unit">円</span>
+          </div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-label">③ LTV総額</div>
+        <div class="result-value ltv">—</div>
+        <div class="result-rows">
+          <div class="result-row"><span>① 推定継続月数（年数）</span><strong class="duration">—</strong></div>
+          <div class="result-row"><span>② 一人あたりLTV</span><strong class="ltvPerMember">—</strong></div>
+          <div class="result-row"><span>④ 月次売上（MRR）</span><strong class="mrr">—</strong></div>
+          <div class="result-row"><span>⑤ 年間売上（ARR）</span><strong class="arr">—</strong></div>
+        </div>
+      </div>
+      <p class="formula calcDetail"></p>
+    </div>
+
+    <div class="panel" data-panel="b">
+      <div class="panel-title">パターンB</div>
+      <div class="card">
+        <div class="field">
+          <label>会員数</label>
+          <div class="input-wrap">
+            <button type="button" class="copy-btn" data-copy="members" title="パターンAの会員数をコピー">Aから取得</button>
+            <input type="number" class="members" value="3441" min="0" step="1">
+            <span class="unit">名</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>退会軒数 ⇄ CCR（退会率）<span class="hint">どちらかを入力するともう片方が自動計算されます</span></label>
+          <div class="pair">
+            <div class="input-wrap">
+              <input type="number" class="churnCount" value="20" min="0" step="1">
+              <span class="unit">軒</span>
+            </div>
+            <span class="pair-arrow">⇄</span>
+            <div class="input-wrap">
+              <input type="number" class="ccr" value="" min="0" max="100" step="0.01">
+              <span class="unit">％</span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>単価（ARPU）<span class="hint">月額</span></label>
+          <div class="input-wrap">
+            <button type="button" class="copy-btn" data-copy="price" title="パターンAの単価をコピー">Aから取得</button>
+            <input type="number" class="price" value="6356" min="0" step="1">
+            <span class="unit">円</span>
+          </div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-label">③ LTV総額</div>
+        <div class="result-value ltv">—</div>
+        <div class="result-diff" id="diffFromA">—</div>
+        <div class="result-rows">
+          <div class="result-row"><span>① 推定継続月数（年数）</span><strong class="duration">—</strong></div>
+          <div class="result-row"><span>② 一人あたりLTV</span><strong class="ltvPerMember">—</strong></div>
+          <div class="result-row"><span>④ 月次売上（MRR）</span><strong class="mrr">—</strong></div>
+          <div class="result-row"><span>⑤ 年間売上（ARR）</span><strong class="arr">—</strong></div>
+        </div>
+      </div>
+      <p class="formula calcDetail"></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const yen = n => '¥' + Math.round(n).toLocaleString('ja-JP');
+  // 1億円以上は億円、それ未満は万円で表示（資料の表記に合わせる）
+  const money = n => {
+    const abs = Math.abs(n);
+    if (abs >= 1e8) {
+      const v = Math.round(n / 1e8 * 100) / 100;
+      return v.toLocaleString('ja-JP', { maximumFractionDigits: 2 }) + '億円';
+    }
+    const v = Math.round(n / 1e4 * 10) / 10;
+    return v.toLocaleString('ja-JP', { maximumFractionDigits: 1 }) + '万円';
+  };
+  const round = (n, digits) => {
+    const p = Math.pow(10, digits);
+    return Math.round(n * p) / p;
+  };
+
+  // 各パターンの最新のLTV総額（円）。差額表示に使う
+  const totals = { a: null, b: null };
+
+  function updateDiff() {
+    const diffEl = document.getElementById('diffFromA');
+    if (totals.a === null || totals.b === null) {
+      diffEl.textContent = '—';
+      diffEl.classList.remove('plus', 'minus');
+      return;
+    }
+    const diff = totals.b - totals.a;
+    const sign = diff > 0 ? '＋' : (diff < 0 ? '−' : '±');
+    diffEl.textContent = `Aとの差額：${sign}${money(Math.abs(diff))}`;
+    diffEl.classList.toggle('plus', diff > 0);
+    diffEl.classList.toggle('minus', diff < 0);
+  }
+
+  function setupPanel(panel) {
+    const panelId = panel.dataset.panel; // 'a' | 'b'
+    const membersInput = panel.querySelector('.members');
+    const churnCountInput = panel.querySelector('.churnCount');
+    const ccrInput = panel.querySelector('.ccr');
+    const priceInput = panel.querySelector('.price');
+
+    const ltvEl = panel.querySelector('.ltv');
+    const durEl = panel.querySelector('.duration');
+    const perEl = panel.querySelector('.ltvPerMember');
+    const mrrEl = panel.querySelector('.mrr');
+    const arrEl = panel.querySelector('.arr');
+    const detailEl = panel.querySelector('.calcDetail');
+
+    // どちらを最後に手入力したかを記録し、会員数変更時はそちらを基準に再計算する
+    let lastEdited = 'count'; // 'count' | 'ccr'
+
+    function syncPair(source) {
+      const members = parseFloat(membersInput.value);
+      if (source === 'count') {
+        const count = parseFloat(churnCountInput.value);
+        ccrInput.value = (members > 0 && count >= 0) ? round(count / members * 100, 3) : '';
+      } else {
+        const ccrPct = parseFloat(ccrInput.value);
+        churnCountInput.value = (members > 0 && ccrPct >= 0) ? round(ccrPct / 100 * members, 1) : '';
+      }
+    }
+
+    function calculate() {
+      const ccrPct = parseFloat(ccrInput.value);
+      const members = parseFloat(membersInput.value);
+      const price = parseFloat(priceInput.value);
+
+      if (!ccrPct || ccrPct <= 0 || isNaN(members) || isNaN(price)) {
+        ltvEl.textContent = '—';
+        durEl.textContent = '—';
+        perEl.textContent = '—';
+        mrrEl.textContent = '—';
+        arrEl.textContent = '—';
+        detailEl.textContent = 'CCRは0より大きい値を入力してください';
+        totals[panelId] = null;
+        updateDiff();
+        return;
+      }
+
+      const ccr = ccrPct / 100;               // ％→小数
+      const duration = 1 / ccr;               // ① 推定継続月数
+      const ltvPerMember = duration * price;  // ② 一人あたりLTV = 継続月数 × ARPU
+      const ltvTotal = ltvPerMember * members;// ③ LTV総額 = ② × 総会員数
+      const mrr = members * price;            // ④ 月次売上（MRR）
+      const arr = mrr * 12;                   // ⑤ 年間売上（ARR）
+
+      ltvEl.textContent = money(ltvTotal);
+      durEl.textContent = `${duration.toFixed(1)}ヶ月（${(duration / 12).toFixed(1)}年）`;
+      perEl.textContent = money(ltvPerMember);
+      mrrEl.textContent = money(mrr);
+      arrEl.textContent = money(arr);
+      detailEl.textContent =
+        `計算式：1 ÷ ${ccrPct}%（退会${churnCountInput.value}軒 ÷ ${members.toLocaleString('ja-JP')}名） = ${duration.toFixed(1)}ヶ月 × ${yen(price)} × ${members.toLocaleString('ja-JP')}名 = ${yen(ltvTotal)}`;
+
+      totals[panelId] = ltvTotal;
+      updateDiff();
+    }
+
+    churnCountInput.addEventListener('input', () => { lastEdited = 'count'; syncPair('count'); calculate(); });
+    ccrInput.addEventListener('input', () => { lastEdited = 'ccr'; syncPair('ccr'); calculate(); });
+    membersInput.addEventListener('input', () => { syncPair(lastEdited); calculate(); });
+    priceInput.addEventListener('input', calculate);
+
+    syncPair('count');
+    calculate();
+  }
+
+  document.querySelectorAll('.panel').forEach(setupPanel);
+
+  // 「Aから取得」ボタン：パターンAの同じ項目の値をパターンBへコピー
+  const panelA = document.querySelector('.panel[data-panel="a"]');
+  document.querySelectorAll('.panel[data-panel="b"] .copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.copy; // 'members' | 'price'
+      const target = btn.closest('.input-wrap').querySelector('input');
+      target.value = panelA.querySelector('.' + key).value;
+      // input イベントを発火させて再計算（会員数の場合はCCR/軒数の連動も走る）
+      target.dispatchEvent(new Event('input'));
+    });
+  });
+</script>
+</body>
+</html>
